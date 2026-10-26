@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+spark-warehouse/
+metastore_db/
+derby.log
+data/raw/
+data/lake/
+*.egg-info/
+.terraform/
+*.tfstate
+*.tfstate.*
+.env
+HANDOFF.md
