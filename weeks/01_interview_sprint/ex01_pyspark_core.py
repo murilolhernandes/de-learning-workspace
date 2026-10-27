@@ -5,14 +5,19 @@ Columns in the transactions CSV (see data/generate_data.py):
 """
 
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 
 def transactions_schema() -> StructType:
     """Return an explicit schema: ids and txn_ts as strings, fuel_gallons and total_amount as
     doubles, item_count as an integer. Every field nullable."""
-    # TODO: build a StructType (why is an explicit schema better than inferSchema?)
-    raise NotImplementedError
+    return StructType([StructField("transaction_id", StringType(), True),
+                          StructField("store_id", StringType(), True),
+                          StructField("txn_ts", StringType(), True),
+                          StructField("loyalty_id", StringType(), True),
+                          StructField("fuel_gallons", DoubleType(), True),
+                          StructField("item_count", IntegerType(), True),
+                          StructField("total_amount", DoubleType(), True)])
 
 
 def read_transactions(spark: SparkSession, path: str) -> DataFrame:
