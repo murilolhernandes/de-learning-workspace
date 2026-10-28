@@ -4,7 +4,7 @@ Columns in the transactions CSV (see data/generate_data.py):
   transaction_id, store_id, txn_ts, loyalty_id, fuel_gallons, item_count, total_amount
 """
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame, SparkSession, functions as F
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 
@@ -22,26 +22,23 @@ def transactions_schema() -> StructType:
 
 def read_transactions(spark: SparkSession, path: str) -> DataFrame:
     """Read a transactions CSV that has a header row, using transactions_schema()."""
-    # TODO: spark.read ... .csv(path)
-    raise NotImplementedError
+    return spark.read.csv(path, header=True, schema=transactions_schema())
 
 
 def large_baskets(df: DataFrame, min_total: float) -> DataFrame:
     """Keep rows whose total_amount is at least min_total."""
-    # TODO: filter
-    raise NotImplementedError
+    return df.filter(df["total_amount"] >= min_total)
 
 
 def add_basket_size(df: DataFrame) -> DataFrame:
     """Add a string column basket_size: 'large' when total_amount >= 50, otherwise 'small'."""
-    # TODO: withColumn + when/otherwise
-    raise NotImplementedError
+    return df.withColumn("basket_size", F.when(df["total_amount"] >= 50, "large").otherwise("small"))
 
 
 def sales_by_store(df: DataFrame) -> DataFrame:
     """One row per store_id with txn_count (number of rows) and revenue (sum of total_amount)."""
     # TODO: groupBy + agg
-    raise NotImplementedError
+    return df.groupBy("store_id").agg((F.count("*")).alias("txn_count"), F.sum("*").alias("total_amount"))
 
 
 def join_store_state(sales: DataFrame, stores: DataFrame) -> DataFrame:
