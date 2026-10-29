@@ -4,7 +4,7 @@ Columns in the transactions CSV (see data/generate_data.py):
   transaction_id, store_id, txn_ts, loyalty_id, fuel_gallons, item_count, total_amount
 """
 
-from pyspark.sql import DataFrame, SparkSession, functions as F
+from pyspark.sql import DataFrame, SparkSession, Window, functions as F
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 
@@ -37,31 +37,28 @@ def add_basket_size(df: DataFrame) -> DataFrame:
 
 def sales_by_store(df: DataFrame) -> DataFrame:
     """One row per store_id with txn_count (number of rows) and revenue (sum of total_amount)."""
-    # TODO: groupBy + agg
-    return df.groupBy("store_id").agg((F.count("*")).alias("txn_count"), F.sum("*").alias("total_amount"))
+    return df.groupBy("store_id").agg((F.count("*")).alias("txn_count"), (F.sum("total_amount")).alias("revenue"))
 
 
 def join_store_state(sales: DataFrame, stores: DataFrame) -> DataFrame:
     """Add the store's `state` to the sales rows. Keep only stores present in both."""
-    # TODO: join on store_id (inner)
-    raise NotImplementedError
+    return sales.join(stores, "store_id")
 
 
 def rank_within_state(df: DataFrame) -> DataFrame:
     """Add state_rank: 1 for the highest revenue in each state, 2 for the next, and so on.
     Ties share a rank and the next rank is NOT skipped."""
-    # TODO: Window.partitionBy(...).orderBy(...) + dense_rank
-    raise NotImplementedError
+    return df.withColumn("state_rank", F.dense_rank().over(Window.partitionBy("state").orderBy(F.col("revenue").desc())))
 
 
 # Fill each value with "transformation" or "action". Spark is lazy: which of these actually
 # trigger work?
 TRANSFORMATIONS_VS_ACTIONS = {
-    "filter": None,
-    "count": None,
-    "groupBy": None,
-    "show": None,
-    "withColumn": None,
-    "collect": None,
-    "join": None,
+    "filter": "transformation",
+    "count": "action",
+    "groupBy": "transformation",
+    "show": "action",
+    "withColumn": "transformation",
+    "collect": "action",
+    "join": "transformation",
 }
