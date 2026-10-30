@@ -5,7 +5,7 @@ Tick a box only when its tests pass. At the end of each week, answer the 3 self-
 ## Week 1: Interview sprint
 - [x] ex01 PySpark core (`tests/test_w01_pyspark_core.py`)
 - [x] ex02 Delta basics (`tests/test_w01_delta_basics.py`)
-- [ ] ex03 SQL windows (`tests/test_w01_sql_windows.py`)
+- [x] ex03 SQL windows (`tests/test_w01_sql_windows.py`)
 - [ ] 20-minute mock interview done
 - [ ] Learning-plan page written in `interview/behavioral_notes.md`
 - [ ] Self-test quiz passed
