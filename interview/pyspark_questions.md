@@ -28,6 +28,12 @@ Answer out loud first, then check the cue. Cues are reminders, not scripts.
 
 9. **How does Delta time travel work, and when is it useful?**
    Cue: every commit is a numbered version in `_delta_log`. Read with `versionAsOf` or `timestampAsOf`. Useful for audits, debugging a bad load and rollback. Old files are removed by `VACUUM`.
+   Study notes (from Week 1 ex02):
+   - **History:** a Delta table is Parquet files plus a `_delta_log/` folder. Every change (write, append, merge, delete) adds one numbered JSON commit. `DeltaTable.forPath(...).history()` returns one row per commit: version, timestamp, operation, metrics.
+   - **Why version 0:** the log counts from zero, so the first write is version 0. An overwrite plus two appends gives versions 0, 1, 2, and the history has 3 rows. `versionAsOf=1` is the state after the first append.
+   - **Real uses:** recover from a bad load (read the earlier version, then `RESTORE TABLE`), debug a number that changed by diffing two versions, reproduce a forecast on a fixed version, and audit what the table looked like on a date.
+   - **Caveat:** not permanent. `VACUUM` deletes old data files (default retention 7 days), so it is a safety net for recent mistakes, not an archive.
+   - **Say it like this:** "Delta keeps a transaction log of every commit, so I can read any earlier version of a table. I'd use that to recover from a bad load or to compare before and after when a number looks wrong, knowing that vacuum limits how far back I can go."
 
 10. **Explain bronze, silver and gold.**
     Cue: bronze = raw, append-only, as received. Silver = cleaned, deduplicated, typed, conformed. Gold = business-ready aggregates and features. Each layer can be rebuilt from the one before.
