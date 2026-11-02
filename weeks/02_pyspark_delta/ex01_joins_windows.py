@@ -1,6 +1,6 @@
 """Exercise 1: joins and window functions. Run:  pytest tests/test_w02_joins_windows.py"""
 
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, Window, functions as F
 
 
 def broadcast_join_stores(txns: DataFrame, stores: DataFrame) -> DataFrame:
@@ -8,8 +8,7 @@ def broadcast_join_stores(txns: DataFrame, stores: DataFrame) -> DataFrame:
 
     Keep every txn column and add only `state` and `brand` from stores.
     """
-    # TODO: F.broadcast(stores.select(...))
-    raise NotImplementedError
+    return txns.join(F.broadcast(stores.select("store_id", "state", "brand")), on="store_id", how="left")
 
 
 def unmatched_transactions(txns: DataFrame, stores: DataFrame) -> DataFrame:
@@ -17,14 +16,13 @@ def unmatched_transactions(txns: DataFrame, stores: DataFrame) -> DataFrame:
 
     Output has only the txn columns.
     """
-    # TODO: how="left_anti"
-    raise NotImplementedError
+    return txns.join(F.broadcast(stores), on="store_id", how="left_anti")
 
 
 def running_sales(txns: DataFrame) -> DataFrame:
     """Add `running_total`: cumulative total_amount per store_id, ordered by txn_ts."""
-    # TODO: Window.partitionBy(...).orderBy(...).rowsBetween(Window.unboundedPreceding, Window.currentRow)
-    raise NotImplementedError
+    window = F.sum("total_amount").over(Window.partitionBy(txns.store_id).orderBy(txns.txn_ts).rowsBetween(Window.unboundedPreceding, Window.currentRow))
+    return txns.withColumn("running_total", window)
 
 
 def add_prev_gap_minutes(txns: DataFrame) -> DataFrame:
@@ -32,8 +30,8 @@ def add_prev_gap_minutes(txns: DataFrame) -> DataFrame:
 
     txn_ts is a timestamp column.
     """
-    # TODO: F.lag over a window, then (unix_timestamp(a) - unix_timestamp(b)) / 60
-    raise NotImplementedError
+    prev_ts = F.lag("txn_ts", 1).over(Window.partitionBy("store_id").orderBy("txn_ts"))
+    return txns.withColumn("prev_gap_min", ((F.unix_timestamp("txn_ts") - F.unix_timestamp(prev_ts)) / 60))
 
 
 def latest_per_key(df: DataFrame, key: str, order_col: str) -> DataFrame:
@@ -41,5 +39,5 @@ def latest_per_key(df: DataFrame, key: str, order_col: str) -> DataFrame:
 
     This is the classic "deduplicate, keep the newest" pattern used in silver layers.
     """
-    # TODO: row_number() over a window ordered by order_col descending, keep rn == 1, drop rn
-    raise NotImplementedError
+    window = F.row_number().over(Window.partitionBy(key).orderBy(F.col(order_col).desc()))
+    return df.withColumn("rn", window).filter(F.col("rn") == 1).drop("rn")
