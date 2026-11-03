@@ -1,12 +1,11 @@
 """Exercise 2: nulls, dates, arrays and structs. Run:  pytest tests/test_w02_nulls_dates_nested.py"""
 
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, functions as F
 
 
 def fill_loyalty(df: DataFrame) -> DataFrame:
     """Replace a null loyalty_id with 'GUEST' and add boolean `is_member` (True when it was not null)."""
-    # TODO: compute is_member BEFORE you overwrite loyalty_id
-    raise NotImplementedError
+    return df.withColumn("is_member", F.col("loyalty_id").isNotNull()).withColumn("loyalty_id", F.when(F.col("loyalty_id").isNull(), "GUEST").otherwise(F.col("loyalty_id")))
 
 
 def parse_timestamps(df: DataFrame) -> DataFrame:
@@ -14,20 +13,17 @@ def parse_timestamps(df: DataFrame) -> DataFrame:
 
     Values that do not parse must become null (not an error).
     """
-    # TODO: F.to_timestamp(col, fmt). Check what happens with spark.sql.ansi.enabled off.
-    raise NotImplementedError
+    return df.withColumn("txn_ts", F.to_timestamp(F.col("txn_ts"), 'yyyy-MM-dd HH:mm:ss'))
 
 
 def add_date_parts(df: DataFrame) -> DataFrame:
     """Given timestamp column txn_ts, add txn_date (date), txn_hour (int) and day_of_week (int, 1=Sunday)."""
-    # TODO: to_date, hour, dayofweek
-    raise NotImplementedError
+    return df.withColumn("txn_date", F.to_date(F.col("txn_ts"))).withColumn("txn_hour", F.hour(F.col("txn_ts"))).withColumn("day_of_week", F.dayofweek(F.col("txn_ts")))
 
 
 def add_store_age_years(stores: DataFrame, as_of: str) -> DataFrame:
     """Add `age_years`: whole years between opened_date (a date column) and as_of ('yyyy-MM-dd')."""
-    # TODO: months_between, then floor(... / 12)
-    raise NotImplementedError
+    return stores.withColumn("age_years", F.floor(F.months_between(F.lit(as_of), F.lit(F.col("opened_date"))) / 12))
 
 
 def skus_per_txn(items: DataFrame) -> DataFrame:
