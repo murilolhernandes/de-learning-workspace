@@ -29,8 +29,7 @@ def add_store_age_years(stores: DataFrame, as_of: str) -> DataFrame:
 def skus_per_txn(items: DataFrame) -> DataFrame:
     """From item rows (transaction_id, sku), return one row per transaction_id with
     `skus` (array of sku) and `sku_count` (size of that array)."""
-    # TODO: groupBy + collect_list, then F.size
-    raise NotImplementedError
+    return items.groupBy("transaction_id").agg(F.collect_list("sku").alias("skus")).withColumn("sku_count", F.size("skus"))
 
 
 def explode_skus(df: DataFrame) -> DataFrame:
