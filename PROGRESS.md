@@ -38,6 +38,7 @@ Tick a box only when its tests pass. At the end of each week, answer the 3 self-
 
 ## Week 6: Orchestration
 - [ ] Workflow runner (`tests/test_w06_orchestration.py`): order, retries, skip downstream
+- [ ] API ingestion (`tests/test_w06_api_ingest.py`): retries, pagination, raw bronze rows, incremental watermark
 - [ ] Concepts explained (jobs, tasks, retries, schedules)
 - [ ] Self-test quiz passed
 
