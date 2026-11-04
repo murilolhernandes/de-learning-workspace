@@ -55,6 +55,8 @@ def _is_unfinished(excinfo) -> bool:
         first_line = message.splitlines()[0] if message else ""
         if first_line.startswith("assert None"):
             return True
+        if first_line.endswith((" in ''", " == ''")):
+            return True
         return first_line.startswith("assert {") and "None" in first_line
     return False
 
