@@ -12,7 +12,7 @@ Tick a box only when its tests pass. At the end of each week, answer the 3 self-
 
 ## Week 2: PySpark and Delta depth I
 - [x] Joins (broadcast, anti)
-- [ ] Windows, nulls and dates
+- [x] Windows, nulls and dates
 - [ ] Delta MERGE upsert
 - [ ] Self-test quiz passed
 

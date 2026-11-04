@@ -23,7 +23,7 @@ def add_date_parts(df: DataFrame) -> DataFrame:
 
 def add_store_age_years(stores: DataFrame, as_of: str) -> DataFrame:
     """Add `age_years`: whole years between opened_date (a date column) and as_of ('yyyy-MM-dd')."""
-    return stores.withColumn("age_years", F.floor(F.months_between(F.lit(as_of), F.lit(F.col("opened_date"))) / 12))
+    return stores.withColumn("age_years", F.floor(F.months_between(F.lit(as_of), F.col("opened_date")) / 12))
 
 
 def skus_per_txn(items: DataFrame) -> DataFrame:
@@ -35,11 +35,9 @@ def skus_per_txn(items: DataFrame) -> DataFrame:
 def explode_skus(df: DataFrame) -> DataFrame:
     """Given a column `skus` (array), return one row per sku: all other columns plus `sku`.
     Drop the `skus` column. Rows with an empty or null array are dropped."""
-    # TODO: F.explode
-    raise NotImplementedError
+    return df.withColumn("sku", F.explode("skus")).drop("skus")
 
 
 def pack_amounts(df: DataFrame) -> DataFrame:
     """Add a struct column `amounts` with fields fuel_gallons and total_amount (keep the originals too)."""
-    # TODO: F.struct(...).alias? Remember you read struct fields with "amounts.total_amount".
-    raise NotImplementedError
+    return df.withColumn("amounts", F.struct("fuel_gallons", "total_amount"))
