@@ -1,6 +1,7 @@
 """Exercise 3: Delta MERGE, schema rules, partitioning. Run:  pytest tests/test_w02_delta_merge.py"""
 
 from pyspark.sql import DataFrame, SparkSession
+from delta import DeltaTable
 
 
 def upsert_stores(spark: SparkSession, path: str, updates: DataFrame) -> None:
@@ -8,15 +9,14 @@ def upsert_stores(spark: SparkSession, path: str, updates: DataFrame) -> None:
 
     Matched rows are updated, new rows are inserted. Nothing is deleted.
     """
-    # TODO: DeltaTable.forPath(spark, path).alias("t").merge(updates.alias("s"), "...")
-    raise NotImplementedError
+    DeltaTable.forPath(spark, path).alias("t").merge(updates.alias("s"), "t.store_id = s.store_id").whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
 
 
 def append_strict(df: DataFrame, path: str) -> None:
     """Plain append to the Delta table at path. If df has columns the table does not,
     Delta must refuse (schema enforcement); do NOT work around it here."""
     # TODO: one line. The point of the test is to see Delta say no.
-    raise NotImplementedError
+    
 
 
 def append_evolving(df: DataFrame, path: str) -> None:
