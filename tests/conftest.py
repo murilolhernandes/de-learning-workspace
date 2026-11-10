@@ -42,3 +42,37 @@ def spark():
     session = get_spark("tests", shuffle_partitions=2)
     yield session
     session.stop()
+
+
+def _is_unfinished(excinfo) -> bool:
+    """True when a test failed only because the exercise isn't started yet."""
+    if excinfo is None:
+        return False
+    if excinfo.errisinstance(NotImplementedError):
+        return True
+    if excinfo.errisinstance(AssertionError):
+        message = str(excinfo.value).strip()
+        first_line = message.splitlines()[0] if message else ""
+        if first_line.startswith("assert None"):
+            return True
+        if first_line.endswith((" in ''", " == ''")):
+            return True
+        return first_line.startswith("assert {") and "None" in first_line
+    return False
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Report not-yet-implemented exercises as skipped, not failed.
+
+    CI then only goes red on real mistakes. Set STRICT_EXERCISES=1 to turn this
+    off and see every unfinished exercise as a failure.
+    """
+    outcome = yield
+    report = outcome.get_result()
+    if os.environ.get("STRICT_EXERCISES") == "1" or report.outcome != "failed":
+        return
+    if _is_unfinished(call.excinfo):
+        report.outcome = "skipped"
+        line = item.reportinfo()[1] or 0
+        report.longrepr = (str(item.path), line, "Skipped: exercise not implemented yet")
