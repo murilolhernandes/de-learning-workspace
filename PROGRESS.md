@@ -18,7 +18,7 @@ Tick a box only when its tests pass. At the end of each week, answer the 3 self-
 
 ## Week 3: PySpark and Delta depth II
 - [ ] Schema enforcement and evolution
-- [ ] Partitioning, shuffles, caching
+- [x] Partitioning, shuffles, caching
 - [ ] Replace a UDF with built-ins
 - [ ] Unit tests for DataFrame functions
 - [ ] Self-test quiz passed

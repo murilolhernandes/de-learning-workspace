@@ -25,14 +25,13 @@ def with_label_udf(df: DataFrame) -> DataFrame:
 
 def with_label_builtin(df: DataFrame) -> DataFrame:
     """Same result as with_label_udf, using only built-in column functions."""
-    # TODO: hint: F.when(...).when(...).otherwise(...), and handle null first
-    raise NotImplementedError
+    return df.withColumn("basket", F.when(F.col("item_count").isNull(), "unknown").when(F.col("item_count") <= 2, "small").when(F.col("item_count") <= 6, "medium").otherwise("large"))
 
 
 # Replace None with True or False.
 UDF_FACTS = {
-    "python_udfs_are_opaque_to_the_catalyst_optimizer": None,
-    "python_udfs_move_rows_between_the_jvm_and_python": None,
-    "built_in_functions_can_be_optimized_by_spark": None,
-    "a_udf_is_the_best_first_choice_for_simple_conditions": None,
+    "python_udfs_are_opaque_to_the_catalyst_optimizer": True,
+    "python_udfs_move_rows_between_the_jvm_and_python": True,
+    "built_in_functions_can_be_optimized_by_spark": True,
+    "a_udf_is_the_best_first_choice_for_simple_conditions": False,
 }
