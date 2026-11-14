@@ -2,20 +2,20 @@
 
 # Replace each None with "fact" or "dimension".
 TABLE_KIND = {
-    "transaction_items": None,
-    "stores": None,
-    "loyalty_members": None,
-    "weather_daily": None,
+    "transaction_items": "fact",
+    "stores": "dimension",
+    "loyalty_members": "dimension",
+    "weather_daily": "fact",
 }
 
 # Replace None with "measure" or "attribute" (measures are summed, attributes are grouped by).
 COLUMN_ROLE = {
-    "quantity": None,
-    "price": None,
-    "state": None,
-    "segment": None,
-    "category": None,
+    "quantity": "measure",
+    "price": "measure",
+    "state": "attribute",
+    "segment": "attribute",
+    "category": "attribute",
 }
 
 # TODO: finish the sentence in one short string: "One row of fact_transaction_item is ..."
-GRAIN = None
+GRAIN = "One row of fact_transaction_item is one SKU line on one transaction"
