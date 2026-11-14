@@ -25,7 +25,7 @@ Tick a box only when its tests pass. At the end of each week, answer the 3 self-
 
 ## Week 4: Modeling and quality
 - [x] Star schema written up
-- [ ] Medallion layer rules written
+- [x] Medallion layer rules written
 - [ ] Quality checks in `quality.py`
 - [ ] Lineage notes
 - [ ] Self-test quiz passed
